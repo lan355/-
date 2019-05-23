@@ -98,8 +98,7 @@ namespace ConsoleApp5
             {
                 N++;
             }
-            Country[] count = new Country[N];
-            n.Start(count, N);
+            n.Start(N);
 
             reader.Close();
             fstream.Close();
@@ -125,11 +124,11 @@ namespace ConsoleApp5
                         switch (m.SelectTerm)
                         {
                             case 0:
-                                count = n.FillMain(count,N);
+                                n.FillMain(N);
                                 N++;
                                 break;
                             case 1:
-                                n.Seen(count,N);
+                                n.Seen(N);
                                 break;
                             case 2:
                                 Menu s = new Menu(new string[] { "Сортировать по названию", "Сортировать по населению", "Сортировать по площади", "Назад"});
@@ -151,16 +150,16 @@ namespace ConsoleApp5
                                             switch (s.SelectTerm)
                                             {
                                                 case 0:
-                                                    count = n.Sort(count, N);
-                                                    n.Seen(count, N);
+                                                    n.Sort(N);
+                                                    n.Seen(N);
                                                     break;
                                                 case 1:
-                                                    count = n.PeopleSort(count, N);
-                                                    n.Seen(count, N);
+                                                    n.PeopleSort(N);
+                                                    n.Seen(N);
                                                     break;
                                                 case 2:
-                                                    count = n.SquareSort(count, N);
-                                                    n.Seen(count, N);
+                                                    n.SquareSort(N);
+                                                    n.Seen(N);
                                                     break;
                                                 case 3:
                                                     goto back1;
@@ -196,29 +195,29 @@ namespace ConsoleApp5
                                                 switch (ch.SelectTerm)
                                                 {
                                                     case 0:
-                                                        n.Seen(count, N);
+                                                        n.Seen(N);
                                                         int ChangePer = 0;
-                                                        count = n.Change(count, N, ChangePer);
+                                                        n.Change(N, ChangePer);
                                                         break;
                                                     case 1:
-                                                        n.Seen(count, N);
+                                                        n.Seen(N);
                                                         ChangePer = 1;
-                                                        count = n.Change(count, N, ChangePer);
+                                                        n.Change(N, ChangePer);
                                                         break;
                                                     case 2:
-                                                        n.Seen(count, N);
+                                                        n.Seen(N);
                                                         ChangePer = 2;
-                                                        count = n.Change(count, N, ChangePer);
+                                                        n.Change(N, ChangePer);
                                                         break;
                                                     case 3:
-                                                        n.Seen(count, N);
+                                                        n.Seen(N);
                                                         ChangePer = 3;
-                                                        count = n.Change(count, N, ChangePer);
+                                                        n.Change(N, ChangePer);
                                                         break;
                                                     case 4:
-                                                        n.Seen(count, N);
+                                                        n.Seen(N);
                                                         ChangePer = 4;
-                                                        count = n.Change(count, N, ChangePer);
+                                                        n.Change(N, ChangePer);
                                                         break;
                                                     case 5:
                                                         goto back1;
@@ -232,11 +231,11 @@ namespace ConsoleApp5
                                 break;
                                 
                             case 4:
-                                n.Seen(count, N);
-                                count = n.Delete(count, N);
+                                n.Seen(N);
+                                n.Delete(N);
                                 N--;
-                                n.WriteFile(count, N);
-                                n.Seen(count, N);
+                                n.WriteFile(N);
+                                n.Seen(N);
                                 break;
                             case 5:
                                 Menu m2 = new Menu(new string[] { "Удалить, если численность населения меньше заданого", "Поиск по названию столицы", "Поиск занимающей площади","Назад"});
@@ -258,22 +257,22 @@ namespace ConsoleApp5
                                             switch (m2.SelectTerm)
                                             {
                                                 case 0:
-                                                    n.Seen(count, N);
+                                                    n.Seen(N);
                                                     Console.WriteLine("Введите численность населения");
                                                     uint DeleteWriter = uint.Parse(Console.ReadLine());
-                                                    int J = n.newN(count, N, DeleteWriter);
-                                                    count = n.DeleteBase(count, N, DeleteWriter,J);
+                                                    int J = n.newN(N, DeleteWriter);
+                                                    n.DeleteBase(N, DeleteWriter,J);
                                                     N = J;
-                                                    n.WriteFile(count, N);
-                                                    n.Seen(count, N);
+                                                    n.WriteFile(N);
+                                                    n.Seen(N);
                                                     break;
                                                 case 1:
-                                                    n.Seen(count, N);
-                                                    count = n.SearchCapital(count, N);
+                                                    n.Seen(N);
+                                                    n.SearchCapital(N);
                                                     break;
                                                 case 2:
-                                                    n.Seen(count, N);
-                                                    count = n.SearchSquare(count, N);
+                                                    n.Seen(N);
+                                                    n.SearchSquare(N);
                                                     break;
                                                 case 3:
                                                     goto back1;
@@ -289,7 +288,12 @@ namespace ConsoleApp5
                                 n.CreatePassword();
                                 break;
                             case 7:
-                                System.Diagnostics.Process.Start(@"F:\Курсовая2\1\Help.txt");
+                                string WayHelp = Environment.CurrentDirectory;
+                                if (File.Exists(WayHelp + "\\Help.txt") == true)
+                                {
+                                    System.Diagnostics.Process.Start(WayHelp + "\\Help.txt");
+                                    
+                                }
                                 break;
                             case 8:
                                 Environment.Exit(0);
@@ -304,7 +308,10 @@ namespace ConsoleApp5
         }
         class Note
         {
-            public void Start(Country[] count, int N)
+
+            private static int N = 100;
+            Country[] count = new Country[N];
+            public void Start(int N)
             {
                 string way = Environment.CurrentDirectory;
                 FileStream fstream = File.OpenRead(way+"\\db.txt");
@@ -373,11 +380,11 @@ namespace ConsoleApp5
 
                 }
                 reader.Close();
-
+                fstream.Close();
 
             }
 
-            public Country[] SearchCapital(Country[] count, int N)
+            public Country[] SearchCapital(int N)
             {
                 string capital;
                 Console.WriteLine("Введите столицу государства");
@@ -386,7 +393,7 @@ namespace ConsoleApp5
                 {
                     if (count[i].Capital == capital)
                     {
-                        Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t", count[i].Name, count[i].Capital, count[i].Continent, count[i].People, count[i].Square);
+                        Console.WriteLine($" {i + 1}\t{count[i].Name}\t{count[i].Capital}\t{count[i].Continent}\t{count[i].People}\t{count[i].Square}");
                     }
                 }
                 Console.ReadLine();
@@ -395,7 +402,7 @@ namespace ConsoleApp5
                 return count;
             }
 
-            public Country[] SearchSquare(Country[] count, int N)
+            public Country[] SearchSquare(int N)
             {
                 uint square;
                 Console.WriteLine("Введите площадь государства");
@@ -404,15 +411,14 @@ namespace ConsoleApp5
                 {
                     if (count[i].Square == square)
                     {
-                        Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t", count[i].Name, count[i].Capital, count[i].Continent, count[i].People, count[i].Square);
+                        Console.WriteLine($" {i + 1}\t{count[i].Name}\t{count[i].Capital}\t{count[i].Continent}\t{count[i].People}\t{count[i].Square}");
                     }
                 }
                 Console.ReadLine();
 
                 return count;
             }
-
-            public Country[] Sort(Country[] count, int N)
+            public Country[] Sort(int N)
             {
                 Country TempCountry;
                 string stroct;
@@ -448,7 +454,7 @@ namespace ConsoleApp5
                 return count;
             }
 
-            public Country[] PeopleSort(Country[] count, int N)
+            public Country[] PeopleSort(int N)
             {
                 Country Temp;
 
@@ -471,7 +477,7 @@ namespace ConsoleApp5
                 return count;
             }
 
-            public Country[] SquareSort(Country[] count, int N)
+            public Country[] SquareSort(int N)
             {
                 Country Temp2;
 
@@ -495,17 +501,18 @@ namespace ConsoleApp5
                 return count;
             }
 
-            public void Seen(Country[] count, int N)
+            public void Seen(int N)
             {
-                Console.WriteLine("№\tСтрана\tСтолица\tКонтинент\tНаселение\tПлощадь");
+                Console.WriteLine("№ \tСтрана|Столица|Континент|Население|Площадь");
                 for (int i = 0; i < N; i++)
                 {
-                    Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", i + 1, count[i].Name, count[i].Capital, count[i].Continent, count[i].People, count[i].Square);
+                    Console.WriteLine($" {i + 1}\t{count[i].Name}\t{count[i].Capital}\t{count[i].Continent}\t{count[i].People}\t{count[i].Square}");
                 }
                 Console.ReadLine();
             }
 
-            public Country[] FillMain(Country[] count, int N)
+
+            public Country[] FillMain(int N)
             {
                 count = Add(count, N);
                 Console.WriteLine("Введите название государства");
@@ -554,12 +561,12 @@ namespace ConsoleApp5
                 }
                 count[N].Square = uint.Parse(Square);
                 N++;
-                WriteFile(count, N);
+                WriteFile(N);
 
                 return count;
             }
 
-            public void WriteFile(Country[] count, int N)
+            public void WriteFile(int N)
             {
                 string way = Environment.CurrentDirectory;
                 FileStream file = new FileStream(way+"\\db.txt", FileMode.Create);
@@ -571,7 +578,7 @@ namespace ConsoleApp5
                     writer.Write("{0}:{1}:{2}:{3}:{4}:\n", count[i].Name, count[i].Capital, count[i].Continent, count[i].People, count[i].Square);
                 }
                 writer.Close();
-
+                file.Close();
 
             }
 
@@ -585,20 +592,17 @@ namespace ConsoleApp5
                     temp[i] = count[i];
                 }
 
-                count = null;
-
                 count = temp;
 
                 return count;
             }
-
-            public Country[] Change(Country[] count, int N, int ChangePer)
+            public Country[] Change(int N, int ChangePer)
             {
 
                 Console.WriteLine("Выберите номер строки");
                 int i = int.Parse(Console.ReadLine()) - 1;
 
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", i + 1, count[i].Name, count[i].Capital, count[i].Continent, count[i].People, count[i].Square);
+                Console.WriteLine($" {i + 1}\t{count[i].Name}\t{count[i].Capital}\t{count[i].Continent}\t{count[i].People}\t{count[i].Square}");
 
                 switch (ChangePer)
                 {
@@ -623,17 +627,17 @@ namespace ConsoleApp5
                         count[i].Square = uint.Parse(Console.ReadLine());
                         break;
                 }
-                WriteFile(count, N);
+                WriteFile(N);
                 Console.WriteLine("\n");
-                Seen(count, N);
+                Seen(N);
                 return count;
             }
 
-            public Country[] Delete(Country[] count, int N)
+            public Country[] Delete(int N)
             {
                 Console.WriteLine("Выберите какую удалить строку");
-                int i = int.Parse(Console.ReadLine()) - 1;   
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", i + 1, count[i].Name, count[i].Capital, count[i].Continent, count[i].People, count[i].Square);
+                int i = int.Parse(Console.ReadLine()) - 1;
+                Console.WriteLine($" {i + 1}\t{count[i].Name}\t{count[i].Capital}\t{count[i].Continent}\t{count[i].People}\t{count[i].Square}");
                 Console.ReadLine();
 
                 Country[] temp = new Country[N-1];
@@ -649,14 +653,12 @@ namespace ConsoleApp5
                     
                            
                 }
-                count = null;
-                count = temp;
-                
 
+                count = temp;
                 return count;
             }
 
-            public Country[] DeleteBase(Country[] count, int N, uint DeleteWriter, int J)
+            public Country[] DeleteBase(int N, uint DeleteWriter, int J)
             {
                 Country[] temp = new Country[J];
                 int p = 0;
@@ -668,15 +670,11 @@ namespace ConsoleApp5
                         p++;
                     }
                 }
-
-                count = null;
-
                 count = temp;
-                 
                 return count;
             }
 
-            public int newN(Country[] count, int N, uint DeleteWriter)
+            public int newN(int N, uint DeleteWriter)
             {
                 int J = 0;
                 for (int i = 0; i < N; i++)
@@ -746,6 +744,7 @@ namespace ConsoleApp5
                     }
                     else
                     {
+                        //string way = Environment.CurrentDirectory;
                         FileStream filepassword = new FileStream(way+"\\password.txt", FileMode.Create);
                         StreamWriter WriterPass = new StreamWriter(filepassword);
                         WriterPass.WriteLine(Create);
@@ -784,6 +783,7 @@ namespace ConsoleApp5
                             }
                             else
                             {
+                                //string way = Environment.CurrentDirectory;
                                 FileStream changepassword = new FileStream(way+"\\password.txt", FileMode.Create);
                                 StreamWriter WriterPassword = new StreamWriter(changepassword);
                                 WriterPassword.WriteLine(Change);
@@ -797,3 +797,4 @@ namespace ConsoleApp5
         }
     }
 }
+
