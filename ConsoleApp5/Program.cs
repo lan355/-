@@ -1,22 +1,25 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Security.AccessControl;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace ConsoleApp5
 {
     class Program
     {
         class Menu
-        { 
+        {
             private string[] _term;
             public int SelectTerm { get; private set; }
             public ConsoleColor ForegroundColor = ConsoleColor.Blue;
             public ConsoleColor BackgroundColor = ConsoleColor.Black;
             public ConsoleColor SelectForegroundColor = ConsoleColor.Black;
             public ConsoleColor SelectBackgroundColor = ConsoleColor.Blue;
+
             public Menu(string[] term)
             {
                 _term = term;
@@ -53,7 +56,7 @@ namespace ConsoleApp5
                 for (int i = 0; i < _term.Length; i++)
                 {
                     if (i == SelectTerm)
-                    { 
+                    {
                         Console.ForegroundColor = this.SelectForegroundColor;
                         Console.BackgroundColor = this.SelectBackgroundColor;
                         Console.WriteLine(_term[i]);
@@ -61,7 +64,7 @@ namespace ConsoleApp5
                         Console.BackgroundColor = this.BackgroundColor;
                     }
                     else Console.WriteLine(_term[i]);
-                    
+
                 }
             }
         }
@@ -73,27 +76,36 @@ namespace ConsoleApp5
         }
 
         static void Main(string[] args)
-         {
+        {
 
             Note n = new Note();
-
             string way = Environment.CurrentDirectory;
+  
             if (File.Exists(way + "\\password.txt") == false)
             {
                 FileStream p = File.Create(way + "\\password.txt");
                 p.Close();
             }
+
+            bool next1 = false;
+            next1 = n.Password(next1);
+
+            if (next1 == false)
+            {
+                Environment.Exit(0);
+            }
+
             if (File.Exists(way + "\\db.txt") == false)
             {
                 FileStream f = File.Create(way + "\\db.txt");
                 f.Close();
             }
-            
-            FileStream fstream = File.OpenRead(way+"\\db.txt");
-            StreamReader reader = new StreamReader(fstream); 
+
+            FileStream fstream = File.OpenRead(way + "\\db.txt");
+            StreamReader reader = new StreamReader(fstream);
             string steam;
             int N = 0;
-            
+
             while ((steam = reader.ReadLine()) != null)
             {
                 N++;
@@ -104,8 +116,8 @@ namespace ConsoleApp5
             fstream.Close();
 
             Console.Title = "zagolovok";
-            back1:
-            Menu m = new Menu(new string[] { "Добавить запись в базу","Просмотр Базы Данных", "Сортировать", "Изменить","Удалить","Допольнительные функции","Изменить/Создать пароль","Справка","Выход"});
+        back1:
+            Menu m = new Menu(new string[] { "Добавить запись в базу", "Просмотр Базы Данных", "Сортировать", "Изменить", "Удалить", "Допольнительные функции", "Изменить/Создать пароль", "Справка", "Выход" });
             ConsoleKeyInfo info;
             bool flag = true;
             do
@@ -131,7 +143,7 @@ namespace ConsoleApp5
                                 n.Seen(N);
                                 break;
                             case 2:
-                                Menu s = new Menu(new string[] { "Сортировать по названию", "Сортировать по населению", "Сортировать по площади", "Назад"});
+                                Menu s = new Menu(new string[] { "Сортировать по названию", "Сортировать по населению", "Сортировать по площади", "Назад" });
                                 ConsoleKeyInfo info2;
                                 bool flag2 = true;
                                 do
@@ -173,7 +185,8 @@ namespace ConsoleApp5
                             case 3:
                                 bool next = false;
                                 next = n.Password(next);
-
+                                
+                                   
                                 if (next == true)
                                 {
                                     Menu ch = new Menu(new string[] { "Изменить название", "Изменить столицу", "Изменить континент", "Изменить численность", "Изменить площадь", "Назад" });
@@ -229,7 +242,7 @@ namespace ConsoleApp5
                                     } while (flagchange);
                                 }
                                 break;
-                                
+
                             case 4:
                                 n.Seen(N);
                                 n.Delete(N);
@@ -238,7 +251,7 @@ namespace ConsoleApp5
                                 n.Seen(N);
                                 break;
                             case 5:
-                                Menu m2 = new Menu(new string[] { "Удалить, если численность населения меньше заданого", "Поиск по названию столицы", "Поиск занимающей площади","Назад"});
+                                Menu m2 = new Menu(new string[] { "Удалить, если численность населения меньше заданого", "Поиск по названию столицы", "Поиск занимающей площади", "Назад" });
                                 ConsoleKeyInfo info1;
                                 bool flag1 = true;
                                 do
@@ -261,7 +274,7 @@ namespace ConsoleApp5
                                                     Console.WriteLine("Введите численность населения");
                                                     uint DeleteWriter = uint.Parse(Console.ReadLine());
                                                     int J = n.newN(N, DeleteWriter);
-                                                    n.DeleteBase(N, DeleteWriter,J);
+                                                    n.DeleteBase(N, DeleteWriter, J);
                                                     N = J;
                                                     n.WriteFile(N);
                                                     n.Seen(N);
@@ -292,7 +305,7 @@ namespace ConsoleApp5
                                 if (File.Exists(WayHelp + "\\Help.txt") == true)
                                 {
                                     System.Diagnostics.Process.Start(WayHelp + "\\Help.txt");
-                                    
+
                                 }
                                 break;
                             case 8:
@@ -301,20 +314,20 @@ namespace ConsoleApp5
                         }
                         m.ShowMenu();
                         break;
-                    
+
                 }
 
             } while (flag);
         }
         class Note
         {
-
+            
             private static int N = 100;
             Country[] count = new Country[N];
             public void Start(int N)
             {
                 string way = Environment.CurrentDirectory;
-                FileStream fstream = File.OpenRead(way+"\\db.txt");
+                FileStream fstream = File.OpenRead(way + "\\db.txt");
                 StreamReader reader = new StreamReader(fstream);
                 string steam;
                 int a, i, c;
@@ -418,6 +431,7 @@ namespace ConsoleApp5
 
                 return count;
             }
+
             public Country[] Sort(int N)
             {
                 Country TempCountry;
@@ -511,6 +525,31 @@ namespace ConsoleApp5
                 Console.ReadLine();
             }
 
+            public string EncriptedReadLine()
+            {
+                string password = "";
+                ConsoleKeyInfo k;
+                while ((k = Console.ReadKey(true)).Key != ConsoleKey.Enter)
+                {
+                    if (k.Key == ConsoleKey.Backspace)
+                    {
+                        if (password.Length > 0)
+                        {
+                            password = password.Remove(password.Length - 1);
+                            Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                            Console.Write(" ");
+                            Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                        }
+                    }
+                    else if (k.KeyChar != 0)
+                    {
+                        password += k.KeyChar;
+                        Console.Write("*");
+                    }
+                }
+                Console.WriteLine();
+                return password;
+            }
 
             public Country[] FillMain(int N)
             {
@@ -536,11 +575,11 @@ namespace ConsoleApp5
                     {
                         Console.WriteLine("Введите число");
                     }
-                    
+
 
                 }
                 count[N].People = uint.Parse(People);
-                
+
 
                 string Square = "";
                 intProv = 0;
@@ -569,7 +608,7 @@ namespace ConsoleApp5
             public void WriteFile(int N)
             {
                 string way = Environment.CurrentDirectory;
-                FileStream file = new FileStream(way+"\\db.txt", FileMode.Create);
+                FileStream file = new FileStream(way + "\\db.txt", FileMode.Create);
 
                 StreamWriter writer = new StreamWriter(file);
 
@@ -596,6 +635,7 @@ namespace ConsoleApp5
 
                 return count;
             }
+
             public Country[] Change(int N, int ChangePer)
             {
 
@@ -640,18 +680,18 @@ namespace ConsoleApp5
                 Console.WriteLine($" {i + 1}\t{count[i].Name}\t{count[i].Capital}\t{count[i].Continent}\t{count[i].People}\t{count[i].Square}");
                 Console.ReadLine();
 
-                Country[] temp = new Country[N-1];
+                Country[] temp = new Country[N - 1];
                 int k = 0;
                 int DeleteStr = i;
                 for (i = 0; i < N; i++)
                 {
-                    if(DeleteStr != i)
+                    if (DeleteStr != i)
                     {
                         temp[k] = count[i];
                         k++;
                     }
-                    
-                           
+
+
                 }
 
                 count = temp;
@@ -662,7 +702,7 @@ namespace ConsoleApp5
             {
                 Country[] temp = new Country[J];
                 int p = 0;
-                for(int i = 0; i < N; i++)
+                for (int i = 0; i < N; i++)
                 {
                     if (DeleteWriter < count[i].People)
                     {
@@ -689,74 +729,117 @@ namespace ConsoleApp5
             }
 
             public bool Password(bool next)
-            { 
-                string password;
-
-                Console.WriteLine("Введите пароль");
-                password = Console.ReadLine();
-
+            {
                 string way = Environment.CurrentDirectory;
-                FileStream FstreamPassword = File.OpenRead(way+"\\password.txt");
-                StreamReader reader = new StreamReader(FstreamPassword);
-                string PassSave = reader.ReadLine();
-                reader.Close();
-                for (int i = 0; i < 5; i++)
-                {
-                    if (password != PassSave)
-                    {
-                        Console.WriteLine("Неверный пароль");
-                        Console.WriteLine("Введите пароль");
-                        password = Console.ReadLine();
+                FileStream fstream = File.OpenRead(way + "\\password.txt");
+                StreamReader readerProv = new StreamReader(fstream);
+                string steam = readerProv.ReadLine();
+                readerProv.Close();
+                fstream.Close();
+                
 
-                    }
-                    if (password == PassSave)
+                if (steam != null)
+                {
+                    string password;
+                    Console.WriteLine("Введите пароль");
+                    password = EncriptedReadLine();
+                    
+                    FileStream FstreamPassword = new FileStream(way + "\\password.txt", FileMode.Open, FileAccess.Read);
+                    DESCryptoServiceProvider cryptic = new DESCryptoServiceProvider();
+                    cryptic.Key = ASCIIEncoding.ASCII.GetBytes("ABCDEFGH");
+                    cryptic.IV = ASCIIEncoding.ASCII.GetBytes("ABCDEFGH");
+                    CryptoStream crStream = new CryptoStream(FstreamPassword, cryptic.CreateDecryptor(), CryptoStreamMode.Read);
+                    StreamReader reader1 = new StreamReader(crStream);
+                    string PassSave = reader1.ReadToEnd();
+                    reader1.Close();
+
+
+                    for (int i = 0; i < 5; i++)
                     {
-                        next = true;
-                        break;
+                        if (password != PassSave)
+                        {
+                            Console.WriteLine("Неверный пароль");
+                            Console.WriteLine("Введите пароль");
+                            password = EncriptedReadLine();
+
+                        }
+                        if (password == PassSave)
+                        {
+                            next = true;
+                            break;
+                        }
                     }
+
+                    FstreamPassword.Close();
+                }
+                else
+                {
+                    next = true;
                 }
                 
 
                 return next;
+             
             }
 
             public void CreatePassword()
             {
+                
                 string Confirm;
                 string Create;
-                string way = Environment.CurrentDirectory;
-                FileStream PasswordEquals = File.OpenRead(way+"\\password.txt");
-                StreamReader ReaderEquals = new StreamReader(PasswordEquals);
-                string Pass = ReaderEquals.ReadLine();
-                ReaderEquals.Close();
+                string Pass;
+                string steam;
 
-                if(Pass == null)
+                string way = Environment.CurrentDirectory;
+                FileStream fstream = File.OpenRead(way + "\\password.txt");
+                StreamReader reader = new StreamReader(fstream);
+                steam = reader.ReadLine();
+                reader.Close();
+
+               
+                if (steam == null)
                 {
                     Console.WriteLine("Введите новый пароль");
-                    Confirm = Console.ReadLine();
-                    Console.WriteLine("Потвердите пароль");
-                    Create = Console.ReadLine();
+                    Confirm = EncriptedReadLine();
 
-                    if(Create != Confirm)
+                    Console.WriteLine("Потвердите пароль");
+                    Create = EncriptedReadLine();
+
+
+                    if (Create != Confirm)
                     {
                         Console.WriteLine("Пароли не совпадают");
                         Console.ReadLine();
                     }
                     else
                     {
-                        //string way = Environment.CurrentDirectory;
-                        FileStream filepassword = new FileStream(way+"\\password.txt", FileMode.Create);
-                        StreamWriter WriterPass = new StreamWriter(filepassword);
-                        WriterPass.WriteLine(Create);
-                        WriterPass.Close();
+                        string srcStr = Create;
+                        FileStream filepassword = new FileStream(way + "\\password.txt", FileMode.Create);
+                        DESCryptoServiceProvider cryptic1 = new DESCryptoServiceProvider();
 
-                    } 
+                        cryptic1.Key = ASCIIEncoding.ASCII.GetBytes("ABCDEFGH");
+                        cryptic1.IV = ASCIIEncoding.ASCII.GetBytes("ABCDEFGH");
+                        CryptoStream crStream1 = new CryptoStream(filepassword, cryptic1.CreateEncryptor(), CryptoStreamMode.Write);
+                        byte[] data = ASCIIEncoding.ASCII.GetBytes(srcStr);
+                        crStream1.Write(data, 0, data.Length);
+                        crStream1.Close();
+                        filepassword.Close();
+                    }
                 }
                 else
                 {
+                    FileStream FstreamPassword = new FileStream(way + "\\password.txt", FileMode.Open, FileAccess.Read);
+                    DESCryptoServiceProvider Fcryptic = new DESCryptoServiceProvider();
+                    Fcryptic.Key = ASCIIEncoding.ASCII.GetBytes("ABCDEFGH");
+                    Fcryptic.IV = ASCIIEncoding.ASCII.GetBytes("ABCDEFGH");
+                    CryptoStream FcrStream = new CryptoStream(FstreamPassword, Fcryptic.CreateDecryptor(), CryptoStreamMode.Read);
+                    StreamReader SavePass = new StreamReader(FcrStream);
+                    Pass = SavePass.ReadToEnd();
+                    SavePass.Close();
+
                     string Password;
                     Console.WriteLine("Введите пароль");
-                    Password = Console.ReadLine();
+                    Password = EncriptedReadLine();
 
                     for (int i = 0; i < 3; i++)
                     {
@@ -765,17 +848,19 @@ namespace ConsoleApp5
                         {
                             Console.WriteLine("Неверный пароль");
                             Console.WriteLine("Введите пароль");
-                            Password = Console.ReadLine();
+                            Password = EncriptedReadLine();
                         }
 
                         else
                         {
                             Console.WriteLine("Введите новый пароль");
-                            string ChangePassword = Console.ReadLine();
+                            string ChangePassword = EncriptedReadLine();
                             Console.WriteLine("Потведите пароль");
-                            string Change = Console.ReadLine();
+                            string Change = EncriptedReadLine();
+                            
+                           
 
-                            if(Change != ChangePassword)
+                            if (Change != ChangePassword)
                             {
                                 Console.WriteLine("Пароли не совпадают");
                                 Console.ReadLine();
@@ -783,18 +868,22 @@ namespace ConsoleApp5
                             }
                             else
                             {
-                                //string way = Environment.CurrentDirectory;
-                                FileStream changepassword = new FileStream(way+"\\password.txt", FileMode.Create);
-                                StreamWriter WriterPassword = new StreamWriter(changepassword);
-                                WriterPassword.WriteLine(Change);
-                                WriterPassword.Close();
+                                string srcStr = Change;
+                                FileStream changepassword = new FileStream(way + "\\password.txt", FileMode.Create);
+                                DESCryptoServiceProvider Wcryptic = new DESCryptoServiceProvider();
+                                Wcryptic.Key = ASCIIEncoding.ASCII.GetBytes("ABCDEFGH");
+                                Wcryptic.IV = ASCIIEncoding.ASCII.GetBytes("ABCDEFGH");
+                                CryptoStream WcrStream = new CryptoStream(changepassword, Wcryptic.CreateEncryptor(), CryptoStreamMode.Write);
+                                byte[] data = ASCIIEncoding.ASCII.GetBytes(srcStr);
+                                WcrStream.Write(data, 0, data.Length);
+                                WcrStream.Close();
+                                changepassword.Close();
                                 break;
                             }
                         }
-                    }                    
+                    }
                 }
             }
         }
     }
 }
-
